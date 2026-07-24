@@ -690,6 +690,35 @@
             </varlistentry>
           </variablelist>Leaving <option>fields</option> unset reproduces the previous, single-id
           behaviour exactly, so existing configurations keep working unchanged.</para>
+        <caution>
+          <para>Moving the id to a target other than the reference/key attribute — as the
+                <literal>ref=id</literal> examples above do — needs one more piece of
+            configuration, or clicking an already-annotated entity to view its details will show
+              <emphasis>"Entity not found"</emphasis> even though the annotation is perfectly
+            valid. The editor's click-to-view popup (a separate mechanism from the edit form,
+            unaware of any particular <option>fields</option> mapping) has to be told which
+            attribute now holds the id for that annotation type, via a
+                <option>keyMap</option> entry in this app's own
+                <filename>config.json</filename>:</para>
+          <programlisting language="json" xml:space="preserve"><![CDATA[{
+    "features": {
+        "annotate": {
+            "configs": {
+                "tei": {
+                    "key": "key",
+                    "keyMap": {
+                        "person": "ref"
+                    }
+                }
+            }
+        }
+    }
+}]]></programlisting>
+          <para>Only the types you actually reconfigure with a non-default <option>fields</option>
+            need an entry here — anything left on the implicit default (the id going straight into
+            the reference/key attribute, as if <option>fields</option> were unset) keeps working
+            with no <option>keyMap</option> entry at all.</para>
+        </caution>
       </section>
       <para>Some connectors require additional configuration attributes. At the moment those are the
           <emphasis> GeoNames</emphasis>, <emphasis>Airtable</emphasis> and
