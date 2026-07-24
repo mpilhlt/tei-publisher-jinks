@@ -82,9 +82,14 @@
                 </listitem>
             </varlistentry>
             <varlistentry>
-                <term>GET /api/reconcile/suggest/entity, /suggest/property, /suggest/type</term>
+                <term>GET /api/reconcile/suggest/entity, /suggest/property, /suggest/type,
+                    /suggest/flyout</term>
                 <listitem>
-                    <para>Auto-suggest services used by OpenRefine's search-as-you-type UI.</para>
+                    <para>Auto-suggest services used by OpenRefine's search-as-you-type UI, plus a
+                        small on-hover HTML preview (<emphasis>flyout</emphasis>) for a suggested
+                        entity, property, or type — 0.2 only, see <link
+                            linkend="reconcile-openrefine">Using this service from
+                            OpenRefine</link>.</para>
                 </listitem>
             </varlistentry>
             <varlistentry>
@@ -112,6 +117,37 @@
                 </listitem>
             </varlistentry>
         </variablelist>
+    </section>
+    <section xml:id="reconcile-openrefine">
+        <title>Using this service from OpenRefine</title>
+        <para>Matching rows against this service works with either manifest version. However, for
+                <emphasis>"Add columns from reconciled values"</emphasis> — OpenRefine's data-extension
+            UI for fetching extra properties (GND identifier, gender, etc.) onto reconciled rows —
+            add the service using the <emphasis>0.2</emphasis> manifest explicitly:</para>
+        <programlisting xml:space="preserve">http://your-app/api/reconcile?version=0.2</programlisting>
+        <para>This is a limitation of OpenRefine's own client, not of the 1.0-draft protocol or of
+            this profile's implementation. OpenRefine's reconciliation UI code (as of the versions
+            tested) only ever looks for the 0.2 manifest field names — <code
+                >extend.propose_properties.service_url</code>/<code>service_path</code> and
+                <code>suggest.property.service_url</code>/<code>service_path</code> — to find the
+            property-proposal and suggest services it needs for this dialog. It has no code path at
+            all for 1.0-draft's boolean-only equivalents (<code>extend.proposeProperties: true</code>,
+                <code>suggest.property: true</code> with an implied canonical path), so pointing
+            OpenRefine at the default, parameter-less 1.0-draft manifest leaves the property list
+            empty and the "Add property" autocomplete unable to reach the suggest service at all —
+            regardless of how spec-conformant that 1.0-draft manifest is. The 1.0-draft manifest is
+            kept spec-pure here (no 0.2-only fields mixed in) since it is what the 1.0-draft
+            conformance testbench validates against; adding OpenRefine-specific fields to it would
+            only serve to work around a client limitation that the <code>?version=0.2</code> manifest
+            already avoids cleanly.</para>
+        <para>A related client quirk worth knowing about if you customize the suggest services:
+            OpenRefine's own autocomplete widget does not follow the 0.2 spec's rule that the
+                <emphasis>absence</emphasis> of a <code>flyout_service_path</code> means "no flyout
+            preview" — it silently falls back to a hardcoded legacy default path instead, which does
+            not exist on this (or most) reconciliation services and 404s on every hover. This is why
+            the shipped 0.2 manifest always declares an explicit <code>flyout_service_path</code> for
+            every suggest service, backed by <code>GET /api/reconcile/suggest/flyout</code>, even
+            though the 0.2 spec itself treats that field as optional.</para>
     </section>
     <section xml:id="reconcile-config">
         <title>Customizing what gets reconciled</title>
