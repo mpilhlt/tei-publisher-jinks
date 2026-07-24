@@ -629,6 +629,16 @@
               above</para>
           </listitem>
         </itemizedlist></para>
+      <caution>
+        <para>The <option>connector</option> value must match one of the names listed above
+            <emphasis>exactly</emphasis>, including capitalization — for example
+            <code>ReconciliationService</code>, not <code>Reconciliation</code> or
+            <code>reconciliationservice</code>. An unrecognized value does not raise an error or a
+          warning of any kind: it silently falls back to the <emphasis>Metagrid</emphasis>
+          connector. If your authority lookups appear to be querying <code
+            >api.metagrid.ch</code> instead of the service you configured, this is almost always
+          the cause — double-check the exact spelling of <option>connector</option> first.</para>
+      </caution>
       <para>In addition, you may define a <option>prefix</option>: this will be prepended to the
         xml:id referenced by the resulting TEI element (separated by a hyphen "-"). For example, you
         may want to prefix the numeric IDs received from GND with the prefix "gnd" to obtain an XML
@@ -766,14 +776,45 @@
           cleaning software <link xlink:href="openrefine.org/">OpenRefine</link>. The specification
           is an open, <link xlink:href="https://www.w3.org/community/reconciliation/"
             >community-maintained</link> standard now, and several authority data providers offer
-          comforming API endpoints. GeoNames, the German GND (again via lobid), Getty vocabularies
+          conforming API endpoints. GeoNames, the German GND (again via lobid), Getty vocabularies
           and Wikidata are some examples – find a list of current services at the <link
-            xlink:href="https://reconciliation-api.github.io/testbench/">service testbench</link>.
-          In addition to the general attributes described above, the only additional bit of
-          configuration is the service URL that should be queried. You specify it in the "endpoint"
-          attribute:</para>
+            xlink:href="https://reconciliation-api.github.io/testbench/">service testbench</link>
+          (or run your own TEI Publisher application's <emphasis>reconcile</emphasis> profile as
+          the service — see <link xlink:href="reconcile.xml">Reconciliation Service API</link>).
+          In addition to the general attributes described above, the required bit of configuration
+          is the service URL that should be queried, given in the <option>endpoint</option>
+          attribute. Both the 0.2 and 1.0-draft versions of the protocol are supported and detected
+          automatically from the service's own manifest.</para>
         <programlisting language="xml" xml:space="preserve">&lt;pb-authority connector="ReconciliationService" name="term" prefix="wd" endpoint="https://wikidata.reconci.link/api"/></programlisting>
         <para>This will retrieve authority entries from wikidata.</para>
+        <para>Two further attributes are optional:<variablelist>
+            <varlistentry>
+              <term>type</term>
+              <listitem>
+                <para>The reconciliation type id to query for (passed as the query's
+                    <code>type</code>), for services whose type vocabulary doesn't match your
+                  annotation type names one-to-one. Defaults to the <option>name</option> attribute
+                  of the enclosing <tag>pb-authority</tag> if omitted, which is correct for
+                  most services, including this project's own <emphasis>reconcile</emphasis>
+                  profile (whose type ids — <emphasis>person</emphasis>,
+                    <emphasis>place</emphasis>, <emphasis>organization</emphasis>,
+                    <emphasis>work</emphasis> — are chosen to match common annotation type names
+                  precisely for this reason).</para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term>limit</term>
+              <listitem>
+                <para>Maximum number of candidates to request per query. Left to the service's own
+                  default if omitted.</para>
+              </listitem>
+            </varlistentry>
+          </variablelist></para>
+        <para>Results in the lookup list are labeled with the provider name
+            <emphasis>Reconciliation</emphasis>, plus the connector's <option>prefix</option> in
+          parentheses if one is set (e.g. <emphasis>Reconciliation (wd)</emphasis>) — useful for
+          telling results apart when more than one reconciliation-style authority is configured for
+          the same or different annotation types.</para>
         <para>The Reconciliation Service connector can also be nested inside the <emphasis
             >Custom</emphasis> connector described below, exactly like any other connector,
           allowing matches from a reconciliation service to be copied into and enriched within

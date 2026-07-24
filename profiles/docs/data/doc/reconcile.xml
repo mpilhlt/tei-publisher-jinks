@@ -215,6 +215,12 @@
             the <code>basicAuth</code>/<code>cookieAuth</code> schemes needed for that are already
             declared. See <filename>profiles/reconcile/doc/README.md</filename>'s "Production
             hardening" section for the exact config variables and worked examples.</para>
+        <para>Real-world batches are not always well-formed — a spreadsheet tool may include a blank
+            cell as a <code>null</code> entry, for instance. A single malformed query anywhere in a
+            batch never fails or misaligns the whole request: it is treated as an empty query
+            (contributing zero candidates at its own position in the results) rather than raising an
+            error, keeping every other query in the same batch — and the strict positional
+            correspondence between queries and results the specification requires — unaffected.</para>
     </section>
     <section xml:id="reconcile-client-side">
         <title>Querying a reconciliation service from TEI Publisher</title>
