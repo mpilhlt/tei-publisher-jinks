@@ -64,7 +64,7 @@ body {
     padding: 0 8px;
 }
 
-#authority-info {
+.authority-info {
     font-size: .9rem;
     max-height: 25vh;
     overflow: auto;
