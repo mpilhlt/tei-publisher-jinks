@@ -219,6 +219,53 @@
                 >profiles/reconcile/doc/README.md</filename>'s "Matching on more than just a name"
             section for the full <option>required</option>/<option>matchQualifier</option>/<option
                 >matchQuantifier</option> rules.</para>
+        <para>A property's <option>value</option> is not limited to reading the matched entity's
+            own record. It is a plain <code>function($entity as element()) as xs:string*</code> —
+            the same general-purpose XQuery function any other closure in this module is, with the
+            same full access to <code>collection()</code>, joins, and aggregation — so nothing in
+            the reconciliation protocol or this profile's implementation restricts it to the
+            entity's own subtree. A property can equally be <emphasis>computed</emphasis> from
+            outside the entity: derived from the wider document corpus, a related register entry,
+            or an external service call. For example, the average length of the title of every
+            document that actually mentions a given person — using this demo's own convention that
+            a document's <code>tei:persName/@key</code> matches the referenced person's <code
+                >@xml:id</code> — needs no change anywhere else in the profile, just one more entry
+            under that type's <option>properties</option>:</para>
+        <programlisting language="xquery" xml:space="preserve"><![CDATA["avg-title-length": map {
+    "name": "Average title length of documents mentioning this person",
+    "value": function($e as element()) as xs:string* {
+        let $id := $e/@xml:id/string()
+        let $lengths :=
+            for $doc in collection($config:data-root)//tei:persName[@key = $id]/root()
+            let $title := $doc//tei:titleStmt/tei:title[1]
+            where exists($title)
+            return string-length(normalize-space($title))
+        return if (exists($lengths)) then string(avg($lengths)) else ()
+    }
+}]]></programlisting>
+        <para>Once added, it needs no further wiring: it shows up in <code
+                >/suggest/property</code> and <code>/extend/propose</code> automatically (both
+            derive their property list from <code>$reconc-config:TYPES</code>, the same as every
+            other property), and <code>/extend</code> computes and returns it exactly like any
+            built-in property — <code>curl -X POST .../api/reconcile/extend -d
+                '{"ids":["some-id"],"properties":[{"id":"avg-title-length"}]}'</code> is enough to
+            try it end to end. The same freedom applies to <option>label</option>,
+                <option>labels</option>, and <option>entities</option>: anything expressible as an
+            XQuery function item is a valid extractor, so a property (or even the label used for
+            matching) can just as well come from a related registry, a computed statistic, or a
+            call to an external API — the only design question is cost, addressed next.</para>
+        <para>Because a computed property like this runs on every <code>/extend</code> request for
+            the ids asked for (never eagerly, and never for ids nobody requested), the only real
+            concern is how expensive the underlying query is at the corpus sizes you actually have.
+            A full <code>collection()</code> scan per call, as in the example above, is fine for a
+            few dozen documents but won't stay cheap indefinitely; if it starts to matter, the same
+            options that already apply elsewhere in this profile apply here too: index the lookup
+            (a range index on <code>persName/@key</code> makes the scan above a direct index hit
+            instead of a document-by-document walk, the same idea <option>fulltext-search</option>
+            already uses for matching, see above), or precompute and cache the aggregate rather
+            than recomputing it inline on every request. Start by simply writing the closure the
+            obvious way and only optimize once it is actually a bottleneck at your real data
+            volumes — that is what the worked example above does.</para>
         <para>Preview rendering (used by <code>/preview</code> and the <code>/entity/{id}</code>
             fallback) reuses the application's own TEI Processing Model transformation by default —
             the same mechanism the registers browse pages use — in the type's
