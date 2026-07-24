@@ -203,26 +203,30 @@
 
     [% template authority-config %]
     <pb-authority-lookup subscribe="transcription" emit="transcription">
-        <pb-authority connector="Custom" name="organization" edit="">
+        <!-- `fields` is configured on THIS, the outer/registered connector (Custom), not any
+             nested connector — createConnectors() only ever registers direct children of
+             <pb-authority-lookup>, so this is the element whose buildProperties() actually runs
+             when a match (from either the local register or a nested connector) is selected.
+             Maps the matched entry's escaped preferred name to @key (replacing the previous
+             plain "id -> key" default) and its id to a new @ref attribute — see
+             tei-publisher-components' Registry.buildProperties/parseFieldsConfig docs for the
+             full "target=source" syntax. Applied consistently to every type below, not just
+             "person": pb-view-annotate's own click-to-view detail popup needs to be told which
+             attribute now holds the id via a matching entry in this app's
+             features.annotate.configs.tei.keyMap (see config.json) — a type left on the old
+             single "@key holds the id" convention (no `fields`, no keyMap entry) still works
+             unchanged, so this is opt-in per type, not an all-or-nothing switch. -->
+        <pb-authority connector="Custom" name="organization" edit="" fields="key=label,ref=id">
             <pb-authority connector="GND" prefix="gnd"></pb-authority>
         </pb-authority>
         <!--pb-authority connector="GeoNames" name="place" user="existdb" prefix="geo"></pb-authority-->
-        <pb-authority connector="Custom" name="place" edit="">
+        <pb-authority connector="Custom" name="place" edit="" fields="key=label,ref=id">
             <pb-authority connector="GeoNames" user="existdb" prefix="geo"></pb-authority>
         </pb-authority>
-        <pb-authority connector="Custom" name="work" edit="">
+        <pb-authority connector="Custom" name="work" edit="" fields="key=label,ref=id">
             <pb-authority connector="GND" prefix="gnd" />
         </pb-authority>
         <pb-authority connector="GND" name="term" prefix="gnd"></pb-authority>
-        <!-- `fields` is configured on THIS, the outer/registered connector (Custom), not the
-             nested ReconciliationService below — createConnectors() only ever registers direct
-             children of <pb-authority-lookup>, so this is the element whose buildProperties()
-             actually runs when a match (from either the local register or a nested connector) is
-             selected. Maps the matched entry's escaped preferred name to @key (replacing the
-             previous plain "id -> key" default) and its id to a new @ref attribute, plus its GND
-             identifier (fetched via the reconciliation service's /extend endpoint) to @gnd - see
-             tei-publisher-components' Registry.buildProperties/parseFieldsConfig docs for the
-             full "target=source" syntax, including the "extend:propId" source form used here. -->
         <pb-authority connector="Custom" name="person" edit="" fields="key=label,ref=id,gnd=extend:gnd">
             <pb-authority connector="GND" prefix="gnd"></pb-authority>
             <!-- Generic OpenRefine Reconciliation API (0.2 + 1.0-draft) connector, decoupled

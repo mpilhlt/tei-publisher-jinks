@@ -40,7 +40,10 @@
                 "tei": {
                     "key": "key",
                     "keyMap": {
-                        "person": "ref"
+                        "person": "ref",
+                        "organization": "ref",
+                        "place": "ref",
+                        "work": "ref"
                     },
                     "id": "http://teipublisher.com/api/annotations/config/tei",
                     "path": "tei-annotation-config.xqm"
