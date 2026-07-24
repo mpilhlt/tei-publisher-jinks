@@ -643,6 +643,54 @@
         xml:id referenced by the resulting TEI element (separated by a hyphen "-"). For example, you
         may want to prefix the numeric IDs received from GND with the prefix "gnd" to obtain an XML
         ID like "gnd-124507514" since a number alone would not be a valid @xml:id.</para>
+      <section xml:id="connector-fields">
+        <title>Mapping matched fields to output attributes</title>
+        <para>By default, selecting a matched entry writes just one value — its id — into the
+          annotation's reference/key attribute (the same one editable in the "Annotation Details"
+          panel). Any connector can instead be configured, via a <option>fields</option> attribute
+          on its <sgmltag>pb-authority</sgmltag> element, to write <emphasis>several</emphasis> of
+          the match's fields into several different, independently named output attributes — for
+          example the matched entry's <emphasis>name</emphasis> into the reference/key attribute and
+          its <emphasis>id</emphasis> into a separate one, rather than the id going to both purposes
+          at once:</para>
+        <programlisting language="xml" xml:space="preserve">&lt;pb-authority connector="ReconciliationService" name="person" endpoint="..." type="person"
+    fields="key=label,ref=id"/&gt;</programlisting>
+        <para>The value is a comma-separated list of <code>target=source</code> pairs. Each
+            <emphasis>target</emphasis> is the name of an output attribute — it only actually ends
+          up on the inserted TEI element if there is also a form field with a matching
+              <option>name</option> for the current annotation type (see <link
+            linkend="annotations-config">Configuring Annotations</link> below); a target with no
+          corresponding form field is silently ignored, not an error, so a <option>fields</option>
+          mapping can freely name a target that only some annotation types have a field for.
+          Recognized <emphasis>source</emphasis> values are:<variablelist>
+            <varlistentry>
+              <term>id</term>
+              <listitem>
+                <para>the matched entry's id — used as-is, unescaped, since ids are already safe
+                  attribute values.</para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term>label</term>
+              <listitem>
+                <para>the matched entry's display name, automatically converted into a
+                  hyphen-separated token safe to use as part of an @xml:id or attribute value (e.g.
+                    <emphasis>"Thurneysen, Eduard"</emphasis> becomes
+                    <emphasis>"Thurneysen-Eduard"</emphasis>), matching the hyphenated id convention
+                  already used elsewhere (e.g. <emphasis>gnd-119442086</emphasis>).</para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term>extend:propertyId</term>
+              <listitem>
+                <para>a property fetched from the service's data-extension endpoint — see <link
+                    linkend="connector-reconciliation">Reconciliation Service Connector</link>
+                  below, the only connector that currently supports this source form.</para>
+              </listitem>
+            </varlistentry>
+          </variablelist>Leaving <option>fields</option> unset reproduces the previous, single-id
+          behaviour exactly, so existing configurations keep working unchanged.</para>
+      </section>
       <para>Some connectors require additional configuration attributes. At the moment those are the
           <emphasis> GeoNames</emphasis>, <emphasis>Airtable</emphasis> and
           <emphasis>Reconciliation</emphasis> connectors. GeoNames requires you to register a user,
@@ -819,6 +867,29 @@
             >Custom</emphasis> connector described below, exactly like any other connector,
           allowing matches from a reconciliation service to be copied into and enriched within
           your local TEI register.</para>
+        <para>If the service advertises the specification's optional <code>/suggest/entity</code>
+          endpoint in its manifest, the connector automatically prefers it over the full batch
+              <code>/reconcile</code> endpoint while the user is typing — the same lighter-weight
+          endpoint OpenRefine's own auto-complete uses — falling back to the full endpoint
+          transparently for services that don't advertise it. Since <code>/suggest/entity</code>
+          only ever returns a plain prefix match on a candidate's own preferred name/label, results
+          may differ from what a full name search finds (no fuzzy/typo tolerance, no confidence
+          score); this only affects the live-typing suggestions, not a full explicit search.</para>
+        <para>Beyond the general <code>id</code>/<code>label</code> sources described in <link
+            linkend="connector-fields">Mapping matched fields to output attributes</link> above,
+          this connector also supports <code>extend:propertyId</code> sources — fetching an
+          additional property value via the service's data-extension endpoint for whichever single
+          entry the user actually selects (one extra request per selection, not per search
+          result):</para>
+        <programlisting language="xml" xml:space="preserve">&lt;pb-authority connector="ReconciliationService" name="person" endpoint="..." type="person"
+    fields="key=label,ref=id,gnd=extend:gnd"/&gt;</programlisting>
+        <para>Here, selecting a match writes its escaped name to <code>@key</code>, its plain id to
+          a new <code>@ref</code> attribute, and — fetched on the fly via <code>/extend</code> — its
+          GND identifier to a new <code>@gnd</code> attribute, provided the service defines a "gnd"
+          property for this type (see its own <code>/extend/propose?type=...</code> response for
+          which property ids it actually offers) and the specific matched entity has a value for
+          it; a property with no value for that particular entity is simply omitted, not written as
+          an empty attribute.</para>
       </section>
       <section xml:id="connector-custom">
         <title>Custom Connector</title>

@@ -228,6 +228,36 @@ document.addEventListener("pb-page-loaded", () => {
 	});
 
 	/**
+	 * Set every form field named in `data` to its corresponding value: a checkbox group gets
+	 * `checked` toggled per matching value(s), anything else gets `.value` set and an "input"
+	 * event dispatched (so e.g. the .form-ref field's own lookup-on-change listener still fires
+	 * exactly as if the user had typed it). A key with no matching named field in the form is
+	 * silently skipped, not an error - lets a `fields` mapping (see the tei-publisher-components
+	 * Registry.buildProperties docs) name a property with no corresponding input for this
+	 * annotation type without failing the whole update.
+	 *
+	 * @param {Object} data map of form field name -> value
+	 */
+	function applyFieldValues(data) {
+		Object.keys(data).forEach((key) => {
+			const field = form.querySelector(`[name="${key}"]`);
+			if (field) {
+				if (field.type === "checkbox") {
+					const values = Array.isArray(data[key])
+						? data[key]
+						: data[key].split(/\s+/);
+					form.querySelectorAll(`[name="${key}"]`).forEach((input) => {
+						input.checked = values.indexOf(input.value) != -1;
+					});
+				} else {
+					field.value = data[key];
+					field.dispatchEvent(new Event("input"));
+				}
+			}
+		});
+	}
+
+	/**
 	 * Display the main form
 	 *
 	 * @param {string} type the annotation type
@@ -260,22 +290,7 @@ document.addEventListener("pb-page-loaded", () => {
 		}
 
 		if (data) {
-			Object.keys(data).forEach((key) => {
-				const field = form.querySelector(`[name="${key}"]`);
-				if (field) {
-					if (field.type === "checkbox") {
-						const values = Array.isArray(data[key])
-							? data[key]
-							: data[key].split(/\s+/);
-						form.querySelectorAll(`[name="${key}"]`).forEach((input) => {
-							input.checked = values.indexOf(input.value) != -1;
-						});
-					} else {
-						field.value = data[key];
-						field.dispatchEvent(new Event("input"));
-					}
-				}
-			});
+			applyFieldValues(data);
 			form
 				.querySelectorAll("pb-repeat")
 				.forEach((repeat) => repeat.setData(data));
@@ -297,13 +312,16 @@ document.addEventListener("pb-page-loaded", () => {
 	/**
 	 * The user selected an authority entry.
 	 *
-	 * @param {any} data details of the selected authority entry
+	 * @param {Object} properties the mapped properties from the pb-authority-select event (see
+	 *   tei-publisher-components' Registry.buildProperties/parseFieldsConfig) - one entry per
+	 *   configured `fields` target, e.g. {key: "Thurneysen-Eduard", ref: "kbga-actors-403"} rather
+	 *   than always just a single bare id. Applied the same way showForm() already pre-fills an
+	 *   existing annotation's fields, so every mapped property with a matching named input in the
+	 *   current annotation-form gets written, not only the one reference/key field this used to be
+	 *   hardcoded to.
 	 */
-	function authoritySelected(ref) {
-		refInput.forEach((input) => {
-			input.value = ref;
-			input.dispatchEvent(new Event("input"));
-		});
+	function authoritySelected(properties) {
+		applyFieldValues(properties);
 
 		if (autoSave) {
 			save();
@@ -1035,11 +1053,23 @@ document.addEventListener("pb-page-loaded", () => {
 		currentUser = ev.detail.user;
 	});
 	window.pbEvents.subscribe("pb-authority-select", "transcription", (ev) =>
-		authoritySelected(ev.detail.properties.ref),
+		authoritySelected(ev.detail.properties),
 	);
-	document.addEventListener("authority-created", (ev) =>
-		authoritySelected(ev.detail.ref),
-	);
+	// authority-created only ever carries a single new entity id (from the person/place/
+	// organization/work "create new entry" editor forms - see e.g. person-editor.html's
+	// <fx-dispatch name="authority-created"><fx-property name="ref" .../>), not a full mapped
+	// properties object the way pb-authority-select does. Write it under whichever field name is
+	// actually configured as the reference/key field (read directly off the .form-ref input
+	// itself, same one refInput/applyFieldValues already targets) rather than hardcoding "ref"
+	// again, so a newly-created local entity ends up in the exact same output attribute a
+	// reconciled match's id would.
+	document.addEventListener("authority-created", (ev) => {
+		const properties = {};
+		if (refInput.length > 0) {
+			properties[refInput[0].name] = ev.detail.ref;
+		}
+		authoritySelected(properties);
+	});
 
 	window.pbEvents.subscribe("pb-selection-changed", "transcription", (ev) => {
 		disableButtons(!ev.detail.hasContent, ev.detail.range);

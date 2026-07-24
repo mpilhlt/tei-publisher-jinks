@@ -42,19 +42,53 @@ declare function anno:entity-type($node as element()) as xs:string? {
 (:~
  : Create TEI for the given type, properties and content of an annotation and return it.
  : This function is called when annotations are merged into the original TEI.
+ :
+ : person/place/term/organization/work all copy EVERY entry of $properties through as an
+ : attribute generically (not just the reference/key field, [[ $key ]]) - this is what makes a
+ : connector's `fields` mapping (see tei-publisher-components' Registry.buildProperties) usable at
+ : all beyond the one hardcoded key attribute: whichever attributes the client-side config maps
+ : (e.g. @ref alongside @[[ $key ]], or a fetched-via-/extend @gnd) land in the output with no
+ : further server-side change needed per newly-mapped field. A form field with no value for the
+ : current selection is never in $properties to begin with (see annotations.js
+ : applyFieldValues/authoritySelected), so this never emits an attribute with an empty value.
  :)
 declare function anno:annotations($type as xs:string, $properties as map(*)?, $content as function(*)) {
     switch ($type)
         case "person" return
-            <persName xmlns="http://www.tei-c.org/ns/1.0" [[ $key ]]="{$properties?[[ $key]]}">{$content()}</persName>
+            <persName xmlns="http://www.tei-c.org/ns/1.0">
+            {
+                for $prop in map:keys($properties) return attribute { $prop } { $properties($prop) },
+                $content()
+            }
+            </persName>
         case "place" return
-            <placeName xmlns="http://www.tei-c.org/ns/1.0" [[ $key ]]="{$properties?[[ $key ]]}">{$content()}</placeName>
+            <placeName xmlns="http://www.tei-c.org/ns/1.0">
+            {
+                for $prop in map:keys($properties) return attribute { $prop } { $properties($prop) },
+                $content()
+            }
+            </placeName>
         case "term" return
-            <term xmlns="http://www.tei-c.org/ns/1.0" [[ $key ]]="{$properties?[[ $key ]]}">{$content()}</term>
+            <term xmlns="http://www.tei-c.org/ns/1.0">
+            {
+                for $prop in map:keys($properties) return attribute { $prop } { $properties($prop) },
+                $content()
+            }
+            </term>
         case "organization" return
-            <orgName xmlns="http://www.tei-c.org/ns/1.0" [[ $key ]]="{$properties?[[ $key ]]}">{$content()}</orgName>
+            <orgName xmlns="http://www.tei-c.org/ns/1.0">
+            {
+                for $prop in map:keys($properties) return attribute { $prop } { $properties($prop) },
+                $content()
+            }
+            </orgName>
         case "work" return
-            <bibl xmlns="http://www.tei-c.org/ns/1.0" [[ $key ]]="{$properties?[[ $key ]]}" type="work">{$content()}</bibl>
+            <bibl xmlns="http://www.tei-c.org/ns/1.0" type="work">
+            {
+                for $prop in map:keys($properties) return attribute { $prop } { $properties($prop) },
+                $content()
+            }
+            </bibl>
         case "hi" return
             <hi xmlns="http://www.tei-c.org/ns/1.0">
             {
