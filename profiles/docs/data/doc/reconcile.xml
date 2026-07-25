@@ -39,6 +39,14 @@
             any conforming client, not just TEI Publisher's own. You do not need the <code
                 >annotate</code> profile to run a reconciliation server, and you do not need this
             profile to use the Reconciliation Service connector against someone else's server.</para>
+        <figure>
+            <title>The service manifest, requested directly in a browser</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="reconcile-manifest.png" width="700px"/>
+                </imageobject>
+            </mediaobject>
+        </figure>
     </section>
     <section xml:id="reconcile-adding">
         <title>Adding the profile to an application</title>
@@ -335,5 +343,15 @@
                 <link xlink:href="annotations.xml">Reconciliation Service
                 connector</link>, which can also be nested inside the Custom connector to combine
             external matches with a local TEI register.</para>
+        <figure>
+            <title>Reconciling a tagged person entity from inside the annotation editor: the
+                Custom connector's federated search combines a local register match with GND
+                candidates in one list</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="reconcile-annotate-search.png" width="700px"/>
+                </imageobject>
+            </mediaobject>
+        </figure>
     </section>
 </article>

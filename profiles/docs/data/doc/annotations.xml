@@ -693,13 +693,10 @@
         <caution>
           <para>Moving the id to a target other than the reference/key attribute — as the
                 <literal>ref=id</literal> examples above do — needs one more piece of
-            configuration, or clicking an already-annotated entity to view its details will show
-              <emphasis>"Entity not found"</emphasis> even though the annotation is perfectly
-            valid. The editor's click-to-view popup (a separate mechanism from the edit form,
-            unaware of any particular <option>fields</option> mapping) has to be told which
-            attribute now holds the id for that annotation type, via a
-                <option>keyMap</option> entry in this app's own
-                <filename>config.json</filename>:</para>
+            configuration to work cleanly. The editor's click-to-view popup (a separate mechanism
+            from the edit form, unaware of any particular <option>fields</option> mapping) has to
+            be told which attribute now holds the id for that annotation type, via a
+                <option>keyMap</option> entry in this app's own <filename>config.json</filename>:</para>
           <programlisting language="json" xml:space="preserve"><![CDATA[{
     "features": {
         "annotate": {
@@ -707,7 +704,10 @@
                 "tei": {
                     "key": "key",
                     "keyMap": {
-                        "person": "ref"
+                        "person": "ref",
+                        "organization": "ref",
+                        "place": "ref",
+                        "work": "ref"
                     }
                 }
             }
@@ -715,10 +715,27 @@
     }
 }]]></programlisting>
           <para>Only the types you actually reconfigure with a non-default <option>fields</option>
-            need an entry here — anything left on the implicit default (the id going straight into
+            need an entry here — a type left on the implicit default (the id going straight into
             the reference/key attribute, as if <option>fields</option> were unset) keeps working
-            with no <option>keyMap</option> entry at all.</para>
+            with no <option>keyMap</option> entry at all. As a safety net, the popup also falls
+            back to the plain <literal>@key</literal> attribute for any annotation where its
+            configured id attribute is missing — so an entity tagged before a
+                <option>fields</option>/<option>keyMap</option> change, or one created against a
+            type you haven't reconfigured yet, still shows its real details rather than
+                <emphasis>"Entity not found"</emphasis>. Still, set <option>keyMap</option>
+            explicitly for any reconfigured type: it is the documented, guaranteed behaviour,
+            rather than relying on that fallback.</para>
         </caution>
+        <figure>
+            <title>Clicking an already-tagged person entity: the popup shows the entity's real
+                preview (here, fetched live from the connector's own service) rather than a bare
+                id or "Entity not found"</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="reconcile-annotate-detail.png" width="500px"/>
+                </imageobject>
+            </mediaobject>
+        </figure>
       </section>
       <para>Some connectors require additional configuration attributes. At the moment those are the
           <emphasis> GeoNames</emphasis>, <emphasis>Airtable</emphasis> and
@@ -892,6 +909,15 @@
           parentheses if one is set (e.g. <emphasis>Reconciliation (wd)</emphasis>) — useful for
           telling results apart when more than one reconciliation-style authority is configured for
           the same or different annotation types.</para>
+        <figure>
+            <title>Search results for a person entity, nested inside a Custom connector: a local
+                register match (badge "local") alongside two GND candidates (badge "GND")</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="reconcile-annotate-search.png" width="500px"/>
+                </imageobject>
+            </mediaobject>
+        </figure>
         <para>The Reconciliation Service connector can also be nested inside the <emphasis
             >Custom</emphasis> connector described below, exactly like any other connector,
           allowing matches from a reconciliation service to be copied into and enriched within
@@ -975,6 +1001,20 @@
         <programlisting language="xml" xml:space="preserve">&lt;pb-authority connector="Custom" name="person">
     &lt;pb-authority connector="ReconciliationService" prefix="wd" endpoint="https://wikidata.reconci.link/api">&lt;/pb-authority>
 &lt;/pb-authority></programlisting>
+        <tip>
+          <para>Nesting <emphasis>more than one</emphasis> connector inside <emphasis>Custom</emphasis>
+            — e.g. both GND and a Reconciliation Service, so either can supply a match — is fully
+            supported, but an <literal>extend:propertyId</literal> field source (see <link
+                linkend="connector-fields">Mapping matched fields to output attributes</link>) is
+            only requested by its <emphasis>property id</emphasis>, not by which connector should
+            answer it: whichever nested connector is tried first and can supply that same property
+            id for the selected match wins, regardless of where the match itself came from. If two
+            nested connectors expose the same real-world value under different property names —
+            as GND and a reconciliation service typically do for an external identifier URL — pick
+            one property id and make sure every nested connector's own record actually exposes a
+            value under that name, rather than assuming the field source only ever talks to one of
+            them.</para>
+        </tip>
       </section>
     </section>
     <section xml:id="annotations-config">
