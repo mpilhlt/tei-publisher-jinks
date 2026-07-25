@@ -64,6 +64,7 @@ body {
     padding: 0 8px;
 }
 
+/* class, not id - annotations.js renders the authority preview into a div with this class */
 .authority-info {
     font-size: .9rem;
     max-height: 25vh;

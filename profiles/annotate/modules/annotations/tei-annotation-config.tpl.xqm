@@ -9,7 +9,12 @@ import module namespace config="http://www.tei-c.org/tei-simple/config" at "../c
 [% let $key = $context?features?annotate?configs?tei?key %]
 
 (:~
- : Name of the attribute to use as reference key for entities
+ : Name of the attribute to use as reference key for entities - a single, global name
+ : (config.json's features.annotate.configs.tei.key, "key" by default) used server-side for
+ : occurrence lookups below. This is a DIFFERENT mechanism from the client-side keyMap in the same
+ : config: keyMap tells the editor's click-to-view popup (pb-view-annotate.js) which attribute
+ : holds an entity's *id* per type, and can point at @ref once a `fields` mapping is configured;
+ : $anno:reference-key/anno:get-key are unrelated to that and always mean literally @key.
  :)
 declare variable $anno:reference-key := '[[ $key ]]';
 

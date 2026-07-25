@@ -204,29 +204,17 @@
 
     [% template authority-config %]
     <pb-authority-lookup subscribe="transcription" emit="transcription">
-        <!-- `fields` is configured on THIS, the outer/registered connector (Custom), not any
-             nested connector — createConnectors() only ever registers direct children of
-             <pb-authority-lookup>, so this is the element whose buildProperties() actually runs
-             when a match (from either the local register or a nested connector) is selected.
-             Maps the matched entry's escaped preferred name to @key (replacing the previous
-             plain "id -> key" default) and its id to a new @ref attribute — see
-             tei-publisher-components' Registry.buildProperties/parseFieldsConfig docs for the
-             full "target=source" syntax. Applied consistently to every type below, not just
-             "person": pb-view-annotate's own click-to-view detail popup needs to be told which
-             attribute now holds the id via a matching entry in this app's
-             features.annotate.configs.tei.keyMap (see config.json) — a type left on the old
-             single "@key holds the id" convention (no `fields`, no keyMap entry) still works
-             unchanged, so this is opt-in per type, not an all-or-nothing switch. "link=extend:link"
-             below exercises GND.fetchExtend/GeoNames.fetchExtend — an external reference URL
-             fetched from that connector's own record, the GND/GeoNames equivalent of person's
-             "gnd=extend:gnd" below fetching from a nested ReconciliationService. Person's Custom
-             wraps BOTH a GND connector and a ReconciliationService connector, and a single search
-             can surface a match from either one (or the local register) depending on where it was
-             first found — Custom.fetchExtend() tries each nested connector in turn with the same
-             requested property ids (see custom.js) until one answers, so "gnd" only resolves
-             consistently regardless of source because GND.fetchExtend's record exposes the GND URI
-             under both "link" (matching GeoNames' own convention) and "gnd" (matching this app's
-             reconcile-config.xql "gnd" property) — see gnd.js. -->
+        <!-- `fields` (target=source,...) is configured on the outer/registered Custom connector,
+             not any nested one — createConnectors() only registers direct children of
+             <pb-authority-lookup>, so Custom's buildProperties() is what actually runs on a
+             selected match, from the local register or any nested connector alike. Below, every
+             type maps a match's name to @key and id to @ref (see
+             tei-publisher-components' Registry.buildProperties/parseFieldsConfig); "link=extend:link"
+             additionally fetches an external reference URL via the nested connector's own
+             fetchExtend(). This is opt-in per type: a type left without `fields` still works on
+             the old plain "id -> @key" default. Whichever attribute ends up holding the id must
+             also be named in this app's features.annotate.configs.tei.keyMap (config.json), so
+             pb-view-annotate's click-to-view popup knows where to find it. -->
         <pb-authority connector="Custom" name="organization" edit="" fields="key=label,ref=id,link=extend:link">
             <pb-authority connector="GND" prefix="gnd"></pb-authority>
         </pb-authority>
@@ -238,6 +226,13 @@
             <pb-authority connector="GND" prefix="gnd" />
         </pb-authority>
         <pb-authority connector="GND" name="term" prefix="gnd"></pb-authority>
+        <!-- Person's Custom wraps two nested connectors, unlike the single-connector types
+             above: a match can come from either one (or the local register), and
+             Custom.fetchExtend() tries each nested connector in turn with the same requested
+             property ids until one answers (see custom.js). "gnd=extend:gnd" resolves
+             consistently regardless of which one that turns out to be only because GND.js's own
+             record aliases its GND URI under both "link" and "gnd" (matching this app's
+             reconcile-config.xql "gnd" property name) — see gnd.js. -->
         <pb-authority connector="Custom" name="person" edit="" fields="key=label,ref=id,gnd=extend:gnd">
             <pb-authority connector="GND" prefix="gnd"></pb-authority>
             <!-- Generic OpenRefine Reconciliation API (0.2 + 1.0-draft) connector, decoupled

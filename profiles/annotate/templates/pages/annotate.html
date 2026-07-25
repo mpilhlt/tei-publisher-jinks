@@ -116,6 +116,11 @@
         <pb-view id="title-view1" src="document1" view="single">
             <pb-param name="mode" value="breadcrumb"></pb-param>
         </pb-view>
+        <!-- keyMap (per entity type: which attribute holds that type's id, e.g. person -> ref)
+             overrides the single global "key" default below on a per-type basis. Serialized to a
+             JSON string here because pb-view-annotate.js parses this attribute itself; falls back
+             to "{}" (not omitting the attribute) so JSON.parse() always has valid input even for
+             a doctype with no keyMap configured. -->
         <pb-view-annotate id="view1" src="document1" odd="[[ if ($doctype = 'tei') then 'annotations' else $doctype || '-annotations']]"
             key="[[ $context?features?annotate?configs?($doctype)?key ]]"
             collapse-whitespace="collapse-whitespace"
