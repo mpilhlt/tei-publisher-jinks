@@ -219,7 +219,14 @@
              unchanged, so this is opt-in per type, not an all-or-nothing switch. "link=extend:link"
              below exercises GND.fetchExtend/GeoNames.fetchExtend — an external reference URL
              fetched from that connector's own record, the GND/GeoNames equivalent of person's
-             "gnd=extend:gnd" below fetching from a nested ReconciliationService. -->
+             "gnd=extend:gnd" below fetching from a nested ReconciliationService. Person's Custom
+             wraps BOTH a GND connector and a ReconciliationService connector, and a single search
+             can surface a match from either one (or the local register) depending on where it was
+             first found — Custom.fetchExtend() tries each nested connector in turn with the same
+             requested property ids (see custom.js) until one answers, so "gnd" only resolves
+             consistently regardless of source because GND.fetchExtend's record exposes the GND URI
+             under both "link" (matching GeoNames' own convention) and "gnd" (matching this app's
+             reconcile-config.xql "gnd" property) — see gnd.js. -->
         <pb-authority connector="Custom" name="organization" edit="" fields="key=label,ref=id,link=extend:link">
             <pb-authority connector="GND" prefix="gnd"></pb-authority>
         </pb-authority>
