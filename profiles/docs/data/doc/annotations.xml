@@ -609,8 +609,12 @@
         </variablelist></para>
       <para>The HTML template defining the user interface of the annotations editor determines which
         authority is used for which annotation type and can be easily adjusted. Just edit the
-          <filename> templates/pages/annotate.html</filename> file, which can be done in eXide (or
-        any editor of your choice). A simple configuration looks as follows:</para>
+          <filename>authority-config</filename> block in the doctype-specific page template — e.g.
+          <filename>templates/pages/annotate-tei.html</filename> for TEI documents (<filename
+            >templates/pages/annotate.html</filename> is a shared base template with no content of
+        its own — see <link linkend="annotations-config">Configuring Annotations</link> below) —
+        which can be done in eXide (or any editor of your choice). A simple configuration looks as
+        follows:</para>
       <programlisting language="xml" xml:space="preserve"><![CDATA[
 <pb-authority-lookup subscribe="transcription" emit="transcription">
     <pb-authority connector="GND" name="organization" prefix="gnd"></pb-authority>
@@ -992,7 +996,7 @@
           is stored in a TEI document residing in <filename>data/registry.xml</filename>. You can
           change the location by modifying the variable
             <varname>$anno:local-authority-file</varname> in the annotation configuration,
-            <filename>modules/annotation-config.xqm</filename>. You can also change the function
+            <filename>modules/annotations/tei-annotation-config.xqm</filename>. You can also change the function
             <function>rapi:insert-point</function> to configure where exactly the local entity
           definitions will be stored.</para>
         <para>Any of the connectors described above — including the Reconciliation Service
@@ -1031,15 +1035,28 @@
         files within TEI Publisher or generated apps:</para>
       <variablelist>
         <varlistentry>
-          <term><filename>templates/pages/annotate.html</filename></term>
+          <term><filename>templates/pages/annotate-tei.html</filename></term>
           <listitem>
-            <para>The HTML page for the annotation editor</para>
+            <para>The HTML page for the TEI annotation editor.
+                <filename>templates/pages/annotate.html</filename> is a base template with empty
+              content blocks, extended by a doctype-specific page — <filename
+                >annotate-tei.html</filename> for TEI documents, <filename
+                >annotate-jats.html</filename> for JATS — which is where the actual toolbar/form
+              markup lives; edit the doctype-specific page, not the base one.</para>
           </listitem>
         </varlistentry>
         <varlistentry>
-          <term><filename>modules/annotation-config.xqm</filename></term>
+          <term><filename>modules/annotations/tei-annotation-config.xqm</filename></term>
           <listitem>
-            <para>Defines how annotations are mapped to TEI</para>
+            <para>Defines how annotations are mapped to TEI for TEI documents. The
+                <filename>annotation-config.xqm</filename> a generated app also ships is a
+                <emphasis>generated dispatcher</emphasis> (from <filename
+                >annotation-config.tpl.xqm</filename>, listed in <filename>config.json</filename>'s
+                <code>features.annotate.configs</code>) that delegates to one file per registered
+              document type — do not hand-edit it directly, a regeneration will overwrite it;
+              edit the doctype-specific module instead (<filename
+                >tei-annotation-config.xqm</filename> for TEI, or add a new
+                <code>configs</code> entry and module for another format).</para>
           </listitem>
         </varlistentry>
         <varlistentry>
@@ -1050,9 +1067,17 @@
           </listitem>
         </varlistentry>
       </variablelist>
+      <caution>
+        <para>The walkthrough below (toolbar button markup, class names like <option
+            >header-toolbar</option>/<option>icon-group</option>) illustrates the general
+          mechanism, but predates TEI Publisher 10's page-template layout and may not match
+          today's <filename>annotate-tei.html</filename> verbatim — check the current template's
+          own <code>annotation-toolbar</code>/<code>annotation-form</code> blocks for the exact
+          markup shape before copying these snippets literally.</para>
+      </caution>
       <para>Let's assume we would like to support an annotation to tag foreign language passages
         with the TEI <tag>foreign</tag> element:</para>
-      <para>First, open <filename>templates/pages/annotate.html</filename> in eXide and locate the
+      <para>First, open <filename>templates/pages/annotate-tei.html</filename> in eXide and locate the
           <tag> div</tag> with class <option>header-toolbar</option>. This is the main toolbar and
         you'll find the list of <option>annotation-action</option> buttons in the second
           <option>span.icon-group</option>. Like many elements in TEI Publisher, <tag>
@@ -1117,8 +1142,8 @@
       </variablelist>
       <para>If you reload the annotation editor in the browser, you should now see your new button.
         However, TEI Publisher does not yet know how to translate the new annotation into actual TEI
-        markup. To fix this, open <filename>modules/annotation-config.xqm</filename> and search for
-        the function <function>anno:annotations</function>. This is a long switch statement with
+        markup. To fix this, open <filename>modules/annotations/tei-annotation-config.xqm</filename>
+        and search for the function <function>anno:annotations</function>. This is a long switch statement with
         cases corresponding to the different annotation types. Add a new case at the top:</para>
       <programlisting>declare function anno:annotations($type as xs:string, $properties as map(*), $content as function(*)) {
     switch ($type)
@@ -1158,7 +1183,7 @@
         better if we could also indicate the used language in <tag>foreign</tag>. This means we have
         to change our annotation from a mere toggle into one which can take an additional
         parameter:</para>
-      <para>To achieve this, go back to <filename>templates/pages/annotate.html</filename> and
+      <para>To achieve this, go back to <filename>templates/pages/annotate-tei.html</filename> and
         remove the <option>toggle</option> class from the <tag>paper-icon-button</tag>:</para>
       <programlisting>&lt;paper-icon-button class="annotation-action" title="Foreign"
         data-type="foreign" icon="icons:language" data-shortcut="⌘+⇧+b,ctrl+⇧+b"
@@ -1178,7 +1203,7 @@
         remember it for later. The label should contain a short title, which will be shown next to
         the input.</para>
       <para>Finally, we need to change our rule in
-          <filename>modules/annotation-config.xqm</filename> to add the new parameter to the
+          <filename>modules/annotations/tei-annotation-config.xqm</filename> to add the new parameter to the
         generated <tag>foreign</tag> element. Navigate to the file and change the
           <function>anno:annotations</function> function as follows:</para>
       <programlisting>declare function anno:annotations($type as xs:string, $properties as map(*), $content as function(*)) {
