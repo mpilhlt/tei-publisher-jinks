@@ -158,20 +158,27 @@ declare function anno:annotations($type as xs:string, $properties as map(*)?, $c
  : Search for existing occurrences of annotations of the given type and key
  : in the data collection.
  :
- : Used to display the occurrence count next to authority entries.
+ : Used to display the occurrence count next to authority entries. $key here is
+ : whatever id pb-authority-lookup.js sent (a candidate's real id, e.g. "kbga-actors-403"
+ : or "gnd-137224435" - see _occurrences() in pb-authority-lookup.js), not necessarily
+ : the value of @[[ $key ]]/$anno:reference-key: once a type is field-mapped (see
+ : annotate-tei.html's `fields=` attributes), the id lands in @ref instead, and @[[ $key ]]
+ : holds the (slugified, non-unique) label. Matching @ref as well as @[[ $key ]] covers
+ : both an unmapped annotation (id in @[[ $key ]]) and a field-mapped one (id in @ref)
+ : without needing this function to know which convention a given annotation used.
  :)
 declare function anno:occurrences($type as xs:string, $key as xs:string) {
     switch ($type)
         case "person" return
-            collection($config:data-default)//tei:persName[@[[ $key ]] = $key]
+            collection($config:data-default)//tei:persName[@[[ $key ]] = $key or @ref = $key]
         case "place" return
-            collection($config:data-default)//tei:placeName[@[[ $key ]] = $key]
+            collection($config:data-default)//tei:placeName[@[[ $key ]] = $key or @ref = $key]
         case "term" return
-            collection($config:data-default)//tei:term[@[[ $key ]] = $key]
+            collection($config:data-default)//tei:term[@[[ $key ]] = $key or @ref = $key]
         case "organization" return
-            collection($config:data-default)//tei:orgName[@[[ $key ]] = $key]
+            collection($config:data-default)//tei:orgName[@[[ $key ]] = $key or @ref = $key]
         case "work" return
-            collection($config:data-default)//tei:bibl[@[[ $key ]] = $key]
+            collection($config:data-default)//tei:bibl[@[[ $key ]] = $key or @ref = $key]
         default return ()
 };
 
