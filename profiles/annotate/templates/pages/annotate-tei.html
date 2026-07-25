@@ -135,6 +135,7 @@
              whichever extra targets are actually configured on the connectors below. -->
         <input type="hidden" name="ref"></input>
         <input type="hidden" name="gnd"></input>
+        <input type="hidden" name="link"></input>
         [% endlet %]
         <div class="authority-info"><pb-i18n key="dialogs.loading">Loading ...</pb-i18n></div>
         <pb-restricted group="tei">
@@ -215,15 +216,18 @@
              attribute now holds the id via a matching entry in this app's
              features.annotate.configs.tei.keyMap (see config.json) — a type left on the old
              single "@key holds the id" convention (no `fields`, no keyMap entry) still works
-             unchanged, so this is opt-in per type, not an all-or-nothing switch. -->
-        <pb-authority connector="Custom" name="organization" edit="" fields="key=label,ref=id">
+             unchanged, so this is opt-in per type, not an all-or-nothing switch. "link=extend:link"
+             below exercises GND.fetchExtend/GeoNames.fetchExtend — an external reference URL
+             fetched from that connector's own record, the GND/GeoNames equivalent of person's
+             "gnd=extend:gnd" below fetching from a nested ReconciliationService. -->
+        <pb-authority connector="Custom" name="organization" edit="" fields="key=label,ref=id,link=extend:link">
             <pb-authority connector="GND" prefix="gnd"></pb-authority>
         </pb-authority>
         <!--pb-authority connector="GeoNames" name="place" user="existdb" prefix="geo"></pb-authority-->
-        <pb-authority connector="Custom" name="place" edit="" fields="key=label,ref=id">
+        <pb-authority connector="Custom" name="place" edit="" fields="key=label,ref=id,link=extend:link">
             <pb-authority connector="GeoNames" user="existdb" prefix="geo"></pb-authority>
         </pb-authority>
-        <pb-authority connector="Custom" name="work" edit="" fields="key=label,ref=id">
+        <pb-authority connector="Custom" name="work" edit="" fields="key=label,ref=id,link=extend:link">
             <pb-authority connector="GND" prefix="gnd" />
         </pb-authority>
         <pb-authority connector="GND" name="term" prefix="gnd"></pb-authority>
