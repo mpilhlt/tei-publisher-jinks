@@ -26,6 +26,11 @@
     ],
     "styles": [
     ],
+    "theme": {
+        "icons": [
+            "annotate-icons.svg"
+        ]
+    },
     "api": [
         {
             "prefix": "anno",

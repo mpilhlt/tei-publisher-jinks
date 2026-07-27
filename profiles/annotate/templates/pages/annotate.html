@@ -37,6 +37,15 @@
     }
     ---
     [% template content-top %]
+    <!-- The toolbar buttons below reference icons via same-document fragment refs
+         (<use href="#person-fill">), which need the sprite's <symbol> defs present
+         somewhere in this page. base10's own theme.icons config key - the mechanism
+         "styles"/"script" use - has no consuming template in this app's actually-deployed
+         base10 (confirmed: templates/layouts/base.html has no icon-include loop, unlike
+         its menu.html/toolbar.html includes), so declaring it in config.json alone (still
+         done, for any base10 that does support it) has no effect here. Inline the sprite
+         directly instead. -->
+    [% include "resources/css/annotate-icons.svg" %]
     <nav class="toolbar">
         <ul>
             <li>
