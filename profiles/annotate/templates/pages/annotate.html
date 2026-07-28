@@ -325,7 +325,16 @@
             <!-- reset -->
             <fx-setvalue ref="key"></fx-setvalue>
             <fx-update></fx-update>
-            <fx-refresh></fx-refresh>
+            <!-- force="" : a bare <fx-refresh> (Fore's default, unforced form) does not
+                 reliably re-render [relevant]/[nonrelevant] when reset-panels is invoked via
+                 <fx-call> from *inside* one of the very cards it's about to hide (e.g. the new
+                 close/cancel buttons in each card header) - confirmed directly: an unforced
+                 refresh left #annotation's `relevant` attribute stuck at "true" after its own
+                 close button set the underlying value to false, while a forced
+                 fx-fore.refresh(true) cleared it correctly every time. force="" is a strict
+                 superset (always re-renders), so this is safe for every existing caller of
+                 reset-panels, not just the new close buttons. -->
+            <fx-refresh force=""></fx-refresh>
         </fx-action>
 
         <!-- Show the revision description panel before sending the document to the server -->
@@ -335,7 +344,7 @@
             <fx-setvalue ref="instance('i-commit')/@export" value="(event('export'), 'false')[1]"></fx-setvalue>
             <fx-setvalue ref="instance('i-commit')/message" value="''"></fx-setvalue>
             <fx-update></fx-update>
-            <fx-refresh></fx-refresh>
+            <fx-refresh force=""></fx-refresh>
         </fx-action>
 
         <fx-action event="pb-selection-changed" target="#document" if="event('hasContent')">

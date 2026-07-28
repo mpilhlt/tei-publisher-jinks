@@ -248,6 +248,23 @@ button.close-panel svg {
     width: 1.1rem;
     height: 1.1rem;
 }
+/* ".preview header" (below) is a flex row splitting a header into a label + an icon-button
+   group; neither side had flex-shrink protection, so once a header holds 4 icon buttons
+   (occurrences' mark-all/search-collection/save-all plus the new close-panel button above) the
+   label and icons compete for the card's ~505px width and the flex algorithm squeezes the
+   *icons* down disproportionately (observed: iron-icon width collapsing to 8px while height
+   stayed 24px, i.e. visibly squashed, not just smaller). Icon buttons keep their natural size;
+   the text label truncates instead, which reads better than a squashed/illegible icon. */
+.preview header button,
+.preview header iron-icon,
+.preview header svg {
+    flex-shrink: 0;
+}
+.preview header > div:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 fx-fore #markupPanel pb-tabs,
 fx-fore #markupPanel .preview-toolbar {
     height: 25vh;
