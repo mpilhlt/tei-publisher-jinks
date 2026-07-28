@@ -114,7 +114,16 @@ fx-fore fx-group > section{
     position: relative;
 }
 
-fx-fore fx-group{
+/* [relevant] here, not just "fx-fore fx-group": fore.css's own generic `[relevant] {
+   display: block; }` rule (same 0,1,0 specificity, loaded after this stylesheet from the
+   CDN) otherwise wins the cascade over a plain two-type-selector rule like this one and
+   silently collapses every visible fx-group back to normal block flow - breaking the
+   grid-based grow/shrink animation entirely and, with it, every card's layout (this was
+   the root cause of the whole annotation-editor side panel looking visually broken:
+   misshapen cards, no spacing, oversized empty areas around otherwise-normal-sized
+   icons/buttons). [relevant] raises this selector's specificity to 0,1,2, beating
+   fore.css's 0,1,0 regardless of stylesheet load order. */
+fx-fore fx-group[relevant]{
     display:grid;
     grid-template-rows:1fr;
     height:auto;
