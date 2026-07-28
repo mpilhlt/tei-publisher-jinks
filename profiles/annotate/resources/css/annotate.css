@@ -265,6 +265,14 @@ button.close-panel svg {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+/* Same flex-squeeze problem as the header icons above, but for icon-only buttons living
+   outside a <header> too - e.g. #form-save (the annotation-form's own save button, a flex
+   sibling of the text <input> it saves) squeezed exactly the same way (iron-icon width
+   collapsing to 8px). Cover every icon-only button in the panel generically instead of
+   special-casing each container. */
+.preview button, .preview iron-icon {
+    flex-shrink: 0;
+}
 fx-fore #markupPanel pb-tabs,
 fx-fore #markupPanel .preview-toolbar {
     height: 25vh;
@@ -331,6 +339,14 @@ pb-view, pb-view-annotate{
     align-items: center;
     /*height: 3rem;*/
     padding:1rem 0.75rem;
+    /* Headers ("Annotation Details", "Revision Description", ...) rendered at the same
+       font-weight (300, Inter's Light) and transparent background as everything around them -
+       nothing set them apart from body text or from the following field labels. A background
+       tint plus a bottom border gives each card a clear title bar; bumping the weight keeps it
+       readable at 16px without needing a larger font-size. */
+    background-color: var(--jinks-colors-100);
+    border-bottom: 1px solid var(--jinks-colors-200);
+    font-weight: 600;
     }
 
 .preview header .toolbar {
@@ -569,6 +585,27 @@ fx-control input[type="text"], fx-control textarea {
 fx-control input[type="text"]:focus, fx-control textarea:focus {
     border-color: #007bff;
     /* Change border color on focus */
+}
+
+/* The annotation-form "correct the transcription" input isn't wrapped in <fx-control> (it's a
+   plain, non-Fore-bound <form> - see annotate.html's "annotation-form edit" block), so it never
+   picked up the fx-control input[type="text"] treatment above and rendered with no visible
+   border or background at all, indistinguishable from the surrounding card. Same visual
+   treatment, applied directly instead of via an fx-control ancestor. */
+.annotation-form input {
+    box-sizing: border-box;
+    width: calc(100% - 2rem);
+    padding: 12px 16px;
+    margin: 0 0 .5rem 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    color: var(--jinks-color-primary);
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+.annotation-form input:focus {
+    border-color: #007bff;
 }
 
 fx-control select {

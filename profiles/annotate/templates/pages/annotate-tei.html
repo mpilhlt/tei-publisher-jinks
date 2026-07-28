@@ -240,8 +240,25 @@
             <!-- Generic OpenRefine Reconciliation API (0.2 + 1.0-draft) connector, decoupled
                  from any particular server via "endpoint" — adjust to point at whichever
                  reconciliation service you want (defaults here to this repo's own local
-                 "reconcile" demo app). See reconcile/doc/README.md. -->
-            <pb-authority connector="ReconciliationService" prefix="reconc"
+                 "reconcile" demo app). See reconcile/doc/README.md.
+
+                 No "prefix" here (unlike GND's "gnd" below): this profile's own reconcile
+                 server matches directly against the *same* local KBGA actors register
+                 (reconcile-config.xql's "person" entities are literally
+                 collection($config:register-root)/id(...)//tei:person[@xml:id], the identical
+                 element the local register search already uses) - a candidate's id already
+                 *is* the local register's own xml:id (e.g. "kbga-actors-27"), not a foreign
+                 id needing disambiguation. Prefixing it (e.g. "reconc-kbga-actors-27") broke
+                 exactly this: selecting a reconciled match created a new, separate,
+                 near-empty local-register entry under the prefixed id instead of resolving to
+                 the already-rich existing entry - confirmed live (a hover/click on the
+                 resulting persName showed only its raw @key, "entity not found", while the
+                 pre-existing persName for the same real person, tagged directly with the
+                 unprefixed id, showed the full name/bio). A prefix is still appropriate for
+                 GND (a genuinely different id space, hence "gnd" below) or any other
+                 reconciliation service that mints its own, unrelated ids - just not for one
+                 that reconciles against this exact register. -->
+            <pb-authority connector="ReconciliationService"
                 endpoint="/exist/apps/tp-reconc/api/reconcile" type="person"></pb-authority>
             <pb-authority connector="GND" prefix="gnd"></pb-authority>
         </pb-authority>

@@ -208,9 +208,16 @@
                 </fx-control>
                 <fx-control ref="instance('i-commit')/@status">
                     <label><pb-i18n key="annotations.status"/></label>
+                    <!-- <option> can only reliably host text, not a nested custom element - a
+                         <pb-i18n> child here never rendered (pb-page's own i18n pass never
+                         "sees" text inside an <option>, and the browser doesn't render/upgrade
+                         non-text option content anyway), leaving both options blank. Use
+                         data-i18n's plain (no [attr] prefix) form instead, which pb-page.js
+                         applies via elem.innerHTML = translated - a plain text/HTML set that
+                         works on any element, <option> included. -->
                     <select class="widget">
-                        <option value="feat"><pb-i18n key="annotations.enrichment"/></option>
-                        <option value="fix"><pb-i18n key="annotations.correction"/></option>
+                        <option value="feat" data-i18n="annotations.enrichment"></option>
+                        <option value="fix" data-i18n="annotations.correction"></option>
                     </select>
                 </fx-control>
                 <fx-trigger>
