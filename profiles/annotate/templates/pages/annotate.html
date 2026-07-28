@@ -190,7 +190,15 @@
 
         <fx-group ref="commit[.='true']" id="commit" track-history="" class="card">
             <section>
-                <header><pb-i18n key="annotations.rev-desc"/></header>
+                <header>
+                    <pb-i18n key="annotations.rev-desc"/>
+                    <fx-trigger>
+                        <button class="close-panel" data-i18n="[title]annotations.cancel" title="Cancel">
+                            <svg><use href="#dialog-close"></use></svg>
+                        </button>
+                        <fx-call action="reset-panels"></fx-call>
+                    </fx-trigger>
+                </header>
                 <fx-control ref="instance('i-commit')/@user">
                     <label><pb-i18n key="annotations.user"/></label>
                 </fx-control>
@@ -220,7 +228,15 @@
         </fx-group>
 
         <fx-group ref="annotation" id="annotation" class="card">
-            <header><pb-i18n key="annotations.details"/></header>
+            <header>
+                <pb-i18n key="annotations.details"/>
+                <fx-trigger>
+                    <button class="close-panel" data-i18n="[title]annotations.cancel" title="Cancel">
+                        <svg><use href="#dialog-close"></use></svg>
+                    </button>
+                    <fx-call action="reset-panels"></fx-call>
+                </fx-trigger>
+            </header>
             <iron-form id="edit-form">
                 <form action="">
                     [% block annotation-form %][% endblock %]
@@ -238,6 +254,12 @@
         <fx-group ref="authority" id="authority" class="card">
             <header>
                 <pb-i18n key="annotations.edit-reference"></pb-i18n>
+                <fx-trigger>
+                    <button class="close-panel" data-i18n="[title]annotations.cancel" title="Cancel">
+                        <svg><use href="#dialog-close"></use></svg>
+                    </button>
+                    <fx-call action="reset-panels"></fx-call>
+                </fx-trigger>
             </header>
             <div id="authority-editor"></div>
 
@@ -255,6 +277,12 @@
                             id="search-collection"><iron-icon icon="icons:search"></iron-icon></button>
                         <button data-i18n="[title]annotations.save-other" id="save-all"><iron-icon
                                 icon="icons:find-replace"></iron-icon></button>
+                        <fx-trigger>
+                            <button class="close-panel" data-i18n="[title]annotations.cancel" title="Cancel">
+                                <svg><use href="#dialog-close"></use></svg>
+                            </button>
+                            <fx-call action="reset-panels"></fx-call>
+                        </fx-trigger>
                     </div>
                 </header>
                 <p class="messages"></p>

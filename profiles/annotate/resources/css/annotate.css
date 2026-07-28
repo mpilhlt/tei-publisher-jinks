@@ -218,6 +218,36 @@ fx-fore textarea {
 fx-group#authority{
     overflow: hidden;
 }
+
+/* This app's actually-deployed base10 ships an older controls.css whose `[role="group"]`
+   pill-button rule (border-radius: var(--jinks-form-border-radius), a 90px pill meant for
+   small toolbar segments) has no `:not(fx-group)` exclusion - unlike the fixed version already
+   in the tei-publisher-jinks git history. Every fx-group card here also carries role="group"
+   (Fore's own accessibility convention), so every card inherited that 90px radius and looked
+   like an oversized speech bubble instead of a normal rounded card. fx-group[role="group"]
+   (specificity 0,1,1) reliably beats the base10 rule (0,1,0) regardless of load order or
+   whether a future base10 update re-adds the exclusion - both cases end up with the same,
+   correct 1rem .card radius. */
+fx-group[role="group"]{
+    border-radius: 1rem;
+}
+
+/* Cancel/close button in each card header (annotation, authority, occurrences, commit) -
+   dismisses the panel via the existing reset-panels action. ".preview header" (below) already
+   right-aligns header content via flex/space-between, so this just sizes the icon itself
+   instead of the oversized default. */
+button.close-panel {
+    background: none;
+    border: none;
+    padding: 0.25rem;
+    line-height: 0;
+    cursor: pointer;
+    color: var(--jinks-color-primary);
+}
+button.close-panel svg {
+    width: 1.1rem;
+    height: 1.1rem;
+}
 fx-fore #markupPanel pb-tabs,
 fx-fore #markupPanel .preview-toolbar {
     height: 25vh;
