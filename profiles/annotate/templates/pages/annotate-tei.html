@@ -232,15 +232,18 @@
              property ids until one answers (see custom.js). "gnd=extend:gnd" resolves
              consistently regardless of which one that turns out to be only because GND.js's own
              record aliases its GND URI under both "link" and "gnd" (matching this app's
-             reconcile-config.xql "gnd" property name) — see gnd.js. -->
+             reconcile-config.xql "gnd" property name) — see gnd.js. Nested-connector query
+             results are concatenated in document order (Custom.query() in custom.js), so
+             ReconciliationService is listed first here to put this profile's own reconciliation
+             matches ahead of GND's in the candidate list. -->
         <pb-authority connector="Custom" name="person" edit="" fields="key=label,ref=id,gnd=extend:gnd">
-            <pb-authority connector="GND" prefix="gnd"></pb-authority>
             <!-- Generic OpenRefine Reconciliation API (0.2 + 1.0-draft) connector, decoupled
                  from any particular server via "endpoint" — adjust to point at whichever
                  reconciliation service you want (defaults here to this repo's own local
                  "reconcile" demo app). See reconcile/doc/README.md. -->
             <pb-authority connector="ReconciliationService" prefix="reconc"
                 endpoint="/exist/apps/tp-reconc/api/reconcile" type="person"></pb-authority>
+            <pb-authority connector="GND" prefix="gnd"></pb-authority>
         </pb-authority>
     </pb-authority-lookup>
     [% endtemplate %]
