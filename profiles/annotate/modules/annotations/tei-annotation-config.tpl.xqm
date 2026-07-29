@@ -186,8 +186,14 @@ declare function anno:occurrences($type as xs:string, $key as xs:string) {
  : Coerce a log field (message/user/status) to a plain string. Defends against a
  : client sending an empty JSON object (e.g. {}) where a string was expected: maps
  : are function items in XQuery 3.1, and atomizing a function item other than an
- : array (e.g. inside a `{...}` attribute value template) throws err:FOTY0013 "A
- : function item other than an array cannot be atomized". This happened in practice
+ : array (e.g. inside an attribute value template's curly-brace interpolation)
+ : throws err:FOTY0013 "A function item other than an array cannot be atomized".
+ : NOTE: do not write a backtick immediately followed by an opening curly brace
+ : anywhere in this file, even inside a comment - Jinks's templates.xqm wraps the
+ : whole .tpl.xqm source in an eXist string constructor and treats that exact
+ : sequence as the start of a real interpolation, corrupting template expansion
+ : (confirmed the hard way: err:XPST0003 "unexpected token: ." from cpy:template).
+ : This happened in practice
  : when an fx-property's expr yielded a raw attribute node instead of an atomized
  : string - JSON.stringify() collapses such a node to "{}" client-side, which
  : parse-json() turns back into an empty map server-side. Fixed at the client too
