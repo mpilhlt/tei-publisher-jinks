@@ -183,9 +183,40 @@ declare function anno:occurrences($type as xs:string, $key as xs:string) {
 };
 
 (:~
+ : Coerce a log field (message/user/status) to a plain string. Defends against a
+ : client sending an empty JSON object (e.g. {}) where a string was expected: maps
+ : are function items in XQuery 3.1, and atomizing a function item other than an
+ : array (e.g. inside a `{...}` attribute value template) throws err:FOTY0013 "A
+ : function item other than an array cannot be atomized". This happened in practice
+ : when an fx-property's expr yielded a raw attribute node instead of an atomized
+ : string - JSON.stringify() collapses such a node to "{}" client-side, which
+ : parse-json() turns back into an empty map server-side. Fixed at the client too
+ : (annotate.html's pb-commit dispatch now calls string() on every property), but
+ : this stays as defense in depth so a malformed request body can never 500 here.
+ :)
+declare function anno:sanitize-log-value($value as item()*) as xs:string {
+    if (empty($value) or $value instance of function(*)) then
+        ""
+    else
+        string($value)
+};
+
+(:~
  : Add a revisionDesc to the TEI header and move notes with a @target into standOff/listAnnotation.
  :)
 declare function anno:extend-header($nodes as node()*, $log as map(*)?) {
+    let $log :=
+        if (empty($log)) then
+            $log
+        else
+            map:merge((
+                $log,
+                map {
+                    "message": anno:sanitize-log-value($log?message),
+                    "user": anno:sanitize-log-value($log?user),
+                    "status": anno:sanitize-log-value($log?status)
+                }
+            ))
     for $node in $nodes
     return
         typeswitch($node)

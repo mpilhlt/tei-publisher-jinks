@@ -222,12 +222,24 @@
                 </fx-control>
                 <fx-trigger>
                     <button data-i18n="[title]annotations.save"><iron-icon icon="icons:save"></iron-icon></button>
-                    <!-- emit a pb-commit event to annotations.js -->
+                    <!-- emit a pb-commit event to annotations.js.
+                         All four expr attributes MUST call string() explicitly: an fx-property
+                         expr that yields a raw attribute node (rather than an atomized string)
+                         gets assigned as-is into the CustomEvent detail object. JSON.stringify()
+                         on that node collapses it to "{}" (DOM/Fore node wrappers expose no own
+                         enumerable properties), so the server receives log.user/log.status as an
+                         empty JSON object instead of a string. tei-annotation-config.xqm's
+                         anno:extend-header() then tries to atomize that empty map inside an
+                         attribute value template ({$log?user}, {$log?status}) and eXist throws
+                         err:FOTY0013 "A function item other than an array cannot be atomized" -
+                         confirmed by reproducing the exact error via an ad-hoc query atomizing a
+                         bare map{} the same way. Only "message" originally called string() here,
+                         which is why the crash was intermittent and looked commit-message-related. -->
                     <fx-dispatch name="pb-commit" targetid="commit">
                         <fx-property name="message" expr="instance('i-commit')/message/string()"></fx-property>
-                        <fx-property name="user" expr="instance('i-commit')/@user"></fx-property>
-                        <fx-property name="export" expr="instance('i-commit')/@export"></fx-property>
-                        <fx-property name="status" expr="instance('i-commit')/@status"></fx-property>
+                        <fx-property name="user" expr="instance('i-commit')/@user/string()"></fx-property>
+                        <fx-property name="export" expr="instance('i-commit')/@export/string()"></fx-property>
+                        <fx-property name="status" expr="instance('i-commit')/@status/string()"></fx-property>
                     </fx-dispatch>
                     <fx-setvalue ref="commit">false</fx-setvalue>
                 </fx-trigger>
