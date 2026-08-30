@@ -5,6 +5,25 @@
  * You should not need to change this unless you want to add new features.
  */
 
+/**
+ * Renders a "<pb-i18n key="..."/> <text>" style status line without ever putting
+ * caller-supplied text through innerHTML - `text` is appended as a real text node, so a
+ * value containing "<"/">"/"&" (e.g. a document-editable @ref value, or a connector's raw
+ * error message) can never be interpreted as markup. Fixes a real, confirmed stored-XSS
+ * class of bug: this exact pattern used to build its "<pb-i18n .../> ${ref}..." string via
+ * a template literal assigned straight to innerHTML, and `ref` here is a `.form-ref`
+ * input's value, which is pre-populated from the document's own @ref/@key attribute when
+ * opening an already-tagged entity - so a malicious @ref in a document would have fired
+ * for any user who later opened that entity's panel, not just someone typing it themselves.
+ */
+function setStatusMessage(container, i18nKey, text) {
+	container.textContent = "";
+	const i18n = document.createElement("pb-i18n");
+	i18n.setAttribute("key", i18nKey);
+	container.appendChild(i18n);
+	container.appendChild(document.createTextNode(` ${text}`));
+}
+
 function randomUUID() {
 	if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
 		return crypto.randomUUID();
@@ -966,8 +985,7 @@ document.addEventListener("pb-page-loaded", () => {
 			const authorityInfo =
 				input.parentElement.querySelector(".authority-info");
 			if (ref && ref.length > 0) {
-				authorityInfo.innerHTML = 
-					`<pb-i18n key="annotations.loading"/> ${ref}...`;
+				setStatusMessage(authorityInfo, "annotations.loading", `${ref}...`);
 				document
 					.querySelector("pb-authority-lookup")
 					.lookup(type, input.value, authorityInfo)
@@ -982,8 +1000,7 @@ document.addEventListener("pb-page-loaded", () => {
 						findOther(info);
 					})
 					.catch((msg) => {
-						authorityInfo.innerHTML = 
-					`<pb-i18n key="annotations.loading-failed"/> ${ref}: ${msg}`;
+						setStatusMessage(authorityInfo, "annotations.loading-failed", `${ref}: ${msg}`);
 					});
 			} else {
 				authorityInfo.innerHTML = "";
@@ -1137,7 +1154,10 @@ document.addEventListener("pb-page-loaded", () => {
 		switch (ev.detail.type) {
 			case "note":
 				const data = JSON.parse(ev.detail.span.dataset.annotation);
-				ev.detail.container.innerHTML = data.properties.note;
+				// Plain document text (the ODD's own [[note]] template interpolation), not
+				// pre-sanitized markup - textContent, not innerHTML, so a note containing
+				// "<"/">"/"&" characters can't be interpreted as HTML.
+				ev.detail.container.textContent = data.properties.note;
 				ev.detail.ready();
 				break;
 			default:
@@ -1149,9 +1169,11 @@ document.addEventListener("pb-page-loaded", () => {
 						const div = document.createElement("div");
 						const h = document.createElement("h3");
 						if (msg) {
-							h.innerHTML = msg;
+							h.textContent = msg;
 						} else {
-							h.innerHTML = `<pb-i18n key="annotations.not-found"/>`;
+							const i18n = document.createElement("pb-i18n");
+							i18n.setAttribute("key", "annotations.not-found");
+							h.appendChild(i18n);
 						}
 						div.appendChild(h);
 						const pre = document.createElement("pre");
