@@ -1,0 +1,288 @@
+{
+  "artifactVersion": 1,
+  "repository": "mpilhlt/tei-publisher-jinks",
+  "topic": "feature/reconcile PR split",
+  "sourceArtifact": "CLAUDE-CODE-HANDOFF-feature-reconcile-pr-split.md",
+  "goal": "Split the current feature/reconcile work into smaller draft PRs, with the frontend event-contract and field-mapping change submitted late.",
+  "currentCloneSnapshot": {
+    "visibleLocalBranch": "copilot/featurereconcile",
+    "visibleLocalBranchNote": "This branch name is quoted exactly as it appeared in the sandbox clone; it mirrors the broader feature/reconcile work.",
+    "headCommit": {
+      "sha": "ee147034f0edb3704a5655233590e6e547d61cd2",
+      "subject": "feat: add the reconcile profile (OpenRefine Reconciliation Service API)"
+    }
+  },
+  "draftPrs": [
+    {
+      "id": "A",
+      "title": "safety / hardening / forms bootstrapping",
+      "kind": "draft",
+      "submissionOrder": 1,
+      "focus": [
+        "XSS fix",
+        "commit-save atomization/FOTY0013 fix",
+        "annotate-link doctype fix",
+        "forms feature bootstrapping",
+        "directly related docs"
+      ],
+      "commits": [
+        {
+          "sha": "b6063034",
+          "subject": "fix: stop building innerHTML from document-editable text via template literals"
+        },
+        {
+          "sha": "43b9f0d5",
+          "subject": "fix(annotate): FOTY0013 on commit save when user/status left as raw nodes"
+        },
+        {
+          "sha": "6952c936",
+          "subject": "fix(annotate): backtick-brace in a doc comment broke Jinks template expansion"
+        },
+        {
+          "sha": "47af6259",
+          "subject": "fix(annotate,forms): annotate-link doctype + dormant fore.js loader"
+        },
+        {
+          "sha": "385880a6",
+          "subject": "docs: fix stale modules/annotation-config.xqm and annotate.html references"
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "title": "annotate panel / UI / CSS repair",
+      "kind": "draft",
+      "submissionOrder": 2,
+      "commits": [
+        {
+          "sha": "ddbf8987",
+          "subject": "fix(annotate): inline the toolbar icon sprite, base10's loader is absent"
+        },
+        {
+          "sha": "21ddec2d",
+          "subject": "fix(annotate): CSS specificity bug broke the whole Fore-based editor panel"
+        },
+        {
+          "sha": "f633d90e",
+          "subject": "fix(annotate): oversized card corners + add a close/cancel button"
+        },
+        {
+          "sha": "2497c053",
+          "subject": "fix(annotate): panel close button didn't work; header icons squashed"
+        },
+        {
+          "sha": "9f1181de",
+          "subject": "fix(annotate): panel legibility, empty status dropdown, id-prefix bug"
+        }
+      ],
+      "manualScopeNotes": [
+        "9f1181de is mixed.",
+        "Keep only the UI, panel, and status-option parts.",
+        "Exclude the annotate-tei person/reconcile hunk."
+      ]
+    },
+    {
+      "id": "C",
+      "title": "annotate-side ReconciliationService hookup",
+      "kind": "draft",
+      "submissionOrder": 3,
+      "role": "bridge",
+      "commits": [
+        {
+          "sha": "3c5be9b3",
+          "subject": "feat(annotate): wire ReconciliationService into live person authority lookup"
+        },
+        {
+          "sha": "7e7376c6",
+          "subject": "fix(annotate): list ReconciliationService before GND for person matches"
+        },
+        {
+          "sha": "0b746ad4",
+          "subject": "docs: warn about the connector-name typo trap; document type/limit attributes"
+        }
+      ],
+      "manualScopeNotes": [
+        "7e7376c6 may need manual conflict resolution if later field-mapping work is absent.",
+        "0b746ad4 is mixed; keep the annotations.xml part, not reconcile.xml."
+      ]
+    },
+    {
+      "id": "D",
+      "title": "late person field-mapping / event-contract stack",
+      "kind": "draft",
+      "submissionOrder": 4,
+      "riskLevel": "late/risky",
+      "whyLate": [
+        "This is the real frontend event-contract-changing stack.",
+        "The practical break is the move to consuming pb-authority-select data via ev.detail.properties.",
+        "Several commits after 8a13573b are completion/fix layers for the same mechanism and are safest reviewed together."
+      ],
+      "commits": [
+        {
+          "sha": "8a13573b",
+          "subject": "feat(annotate): fan out a matched authority's fields to multiple attributes"
+        },
+        {
+          "sha": "da6dfbda",
+          "subject": "fix(annotate): real @ref-vs-@key bug behind \"entity not found\"/shallow info"
+        },
+        {
+          "sha": "fd681a53",
+          "subject": "fix(annotate): fix \"Entity not found\" for field-mapped entities; contain preview overflow"
+        },
+        {
+          "sha": "c3f0b8c6",
+          "subject": "fix(annotate): anno:occurrences must also match @ref, not just @key"
+        },
+        {
+          "sha": "7b608f36",
+          "subject": "docs(annotate): clarify person's gnd=extend:gnd field mapping"
+        },
+        {
+          "sha": "0b754d0a",
+          "subject": "docs: update reconciliation docs for current keyMap/getId fallback, add screenshots"
+        },
+        {
+          "sha": "bd613fa1",
+          "subject": "docs(comments): audit annotate profile wiring code comments"
+        },
+        {
+          "sha": "5f089b68",
+          "subject": "fix(annotate): repair broken cy.uploadXml calls + stale template URL in tests"
+        }
+      ],
+      "manualScopeNotes": [
+        "7b608f36 may become empty after conflict resolution.",
+        "0b754d0a is mixed; keep the annotate-related annotations.xml updates and the screenshots reconcile-annotate-detail.png and reconcile-annotate-search.png, but not reconcile.xml or reconcile-manifest.png."
+      ]
+    },
+    {
+      "id": "E",
+      "title": "late follow-up: extend field-mapping to organization / place / work",
+      "kind": "draft",
+      "submissionOrder": 5,
+      "riskLevel": "late/risky",
+      "commits": [
+        {
+          "sha": "2ad80fbf",
+          "subject": "feat(annotate): extend field-mapping + keyMap fix to organization/place/work"
+        },
+        {
+          "sha": "bce2d5a2",
+          "subject": "feat(annotate): wire extend:link into organization/place/work's fields="
+        },
+        {
+          "sha": "6e259cca",
+          "subject": "docs(annotate): document the keyMap companion config for fields="
+        }
+      ],
+      "manualScopeNotes": [
+        "bce2d5a2 may become effectively empty after adapting 2ad80fbf.",
+        "6e259cca may also become empty if PR D already carries the richer keyMap/fallback docs wording."
+      ]
+    },
+    {
+      "id": "PR2",
+      "title": "reconcile profile proper",
+      "kind": "draft",
+      "submissionOrder": 6,
+      "commits": [
+        {
+          "sha": "ee147034",
+          "subject": "feat: add the reconcile profile (OpenRefine Reconciliation Service API)"
+        },
+        {
+          "sha": "eb622759",
+          "subject": "docs: add reconcile profile documentation, fix stale Custom-connector caveat"
+        },
+        {
+          "sha": "d9752572",
+          "subject": "docs(reconcile): registers profile is now optional, not a hard dependency"
+        },
+        {
+          "sha": "ff5fa3db",
+          "subject": "docs(reconcile): mention fuzzy matching, name variants, and Lucene pre-filtering"
+        },
+        {
+          "sha": "d66e5b54",
+          "subject": "docs(reconcile): mention property/id query-condition matching"
+        },
+        {
+          "sha": "6a4f1cee",
+          "subject": "Document production-hardening options for the reconcile profile",
+          "notes": [
+            "Verbatim subject from git history.",
+            "Unlike neighboring docs commits, this one has no docs: prefix."
+          ]
+        },
+        {
+          "sha": "93944b89",
+          "subject": "docs(reconcile): recommend ?version=0.2 for OpenRefine's data-extension UI"
+        },
+        {
+          "sha": "66ece1b3",
+          "subject": "docs(reconcile): document computing a property from outside the entity"
+        },
+        {
+          "sha": "c581036a",
+          "subject": "docs(reconcile): document the fixed preview - absolute links, property list, images"
+        }
+      ]
+    }
+  ],
+  "compatibilityConclusions": [
+    "The field-mapping change is backward-compatible at the authority-response level if connectors provide normalized id, label, and optional extend:* properties.",
+    "It is not backward-compatible with an older frontend event payload that only exposes detail.ref; the late field-mapping stack presupposes ev.detail.properties.",
+    "Leaving fields unset preserves older behavior.",
+    "Existing saved annotations keep working because later commits add keyMap, @ref occurrence matching, and fallback handling."
+  ],
+  "keyFiles": [
+    "profiles/annotate/resources/scripts/annotations/annotations.js",
+    "profiles/annotate/modules/annotations/tei-annotation-config.tpl.xqm",
+    "profiles/annotate/templates/pages/annotate-tei.html",
+    "profiles/annotate/templates/pages/annotate.html",
+    "profiles/annotate/resources/css/annotate.css",
+    "profiles/annotate/templates/annotation-blocks.html",
+    "profiles/forms/config.json",
+    "profiles/docs/data/doc/annotations.xml",
+    "profiles/docs/data/doc/reconcile.xml",
+    "profiles/annotate/config.json"
+  ],
+  "mixedCommitTroubleSpots": [
+    "9f1181de mixes UI fixes with person/reconcile/id-prefix behavior.",
+    "7e7376c6 assumes later field-mapping context in annotate-tei.html.",
+    "0b746ad4 mixes annotations.xml and reconcile.xml.",
+    "0b754d0a mixes annotations.xml, reconcile.xml, and screenshot assets.",
+    "2ad80fbf and bce2d5a2 were authored on top of later field-mapping state and may need manual adaptation."
+  ],
+  "validationAndBlockers": {
+    "environmentNotes": [
+      "npm ci failed because Cypress download was blocked.",
+      "npm ci --ignore-scripts worked well enough to run npm run build.",
+      "npm run build succeeded, but rewrote profiles/theme-base10/doc/README.md; revert that generated file before committing.",
+      "Secret scanning passed on the changed files.",
+      "Remote push and PR creation failed with HTTP 403, so no remote draft PRs were created."
+    ],
+    "annotateReviewConstraints": [
+      "Ensure profiles/annotate/resources/scripts/annotations/annotations.js does not reintroduce innerHTML XSS.",
+      "Ensure the string() atomization fix remains in commit-save properties in profiles/annotate/templates/pages/annotate.html.",
+      "Ensure the <option data-i18n=\"...\"> fix remains for status dropdown labels.",
+      "Ensure force=\"\" remains on the relevant fx-refresh calls for panel closing reliability.",
+      "Ensure .authority-info remains a class selector in CSS, not #authority-info.",
+      "Ensure the reliable annotate-link doctype computation remains in profiles/annotate/templates/annotation-blocks.html."
+    ]
+  },
+  "suggestedFirstPrompt": "In mpilhlt/tei-publisher-jinks, reconstruct the PR split for feature/reconcile using the handoff files CLAUDE-CODE-HANDOFF-feature-reconcile-pr-split.md and CLAUDE-CODE-HANDOFF-feature-reconcile-pr-split.json. Start by fetching full history and upstream eeditiones/jinks, verify the merge-base against main, then recreate Draft PRs A-E plus PR 2 as local branches. When cherry-picking mixed commits, preserve the scope notes in the handoff. Validate with npm ci --ignore-scripts and npm run build, revert generated profiles/theme-base10/doc/README.md, and avoid reintroducing the annotated XSS, string(), force-refresh, and class-selector regressions called out in the handoff.",
+  "reconstructionChecklist": [
+    "Fetch full history and upstream refs.",
+    "Reconfirm merge-base with upstream/main or origin/main.",
+    "Recreate PR A from main.",
+    "Recreate PR B from main, splitting 9f1181de manually.",
+    "Recreate PR C from main, splitting 0b746ad4 manually.",
+    "Recreate PR D late, likely on top of C for least pain.",
+    "Recreate PR E on top of D.",
+    "Recreate PR 2 from main.",
+    "Validate each branch.",
+    "Push and open draft PRs once credentials allow it."
+  ]
+}
