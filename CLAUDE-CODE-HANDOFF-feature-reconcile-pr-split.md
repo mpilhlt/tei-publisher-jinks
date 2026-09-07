@@ -89,7 +89,7 @@ Cherry-picks:
 - `d9752572` — `docs(reconcile): registers profile is now optional, not a hard dependency`
 - `ff5fa3db` — `docs(reconcile): mention fuzzy matching, name variants, and Lucene pre-filtering`
 - `d66e5b54` — `docs(reconcile): mention property/id query-condition matching`
-- `6a4f1cee` — `Document production-hardening options for the reconcile profile`
+- `6a4f1cee` — `Document production-hardening options for the reconcile profile` *(verbatim subject; unlike the neighboring docs commits, this one has no `docs:` prefix)*
 - `93944b89` — `docs(reconcile): recommend ?version=0.2 for OpenRefine's data-extension UI`
 - `66ece1b3` — `docs(reconcile): document computing a property from outside the entity`
 - `c581036a` — `docs(reconcile): document the fixed preview - absolute links, property list, images`
