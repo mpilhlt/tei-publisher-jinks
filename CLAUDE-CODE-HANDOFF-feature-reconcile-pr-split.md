@@ -7,6 +7,8 @@ Split the current `feature/reconcile` work into smaller draft PRs, with the fron
 In this current clone snapshot, only `copilot/featurereconcile` is visible locally, currently at:
 - `ee147034f0edb3704a5655233590e6e547d61cd2` — `feat: add the reconcile profile (OpenRefine Reconciliation Service API)`
 
+That branch name is quoted exactly as it appears in this sandbox clone; it is the local mirror of the broader `feature/reconcile` work discussed below.
+
 In the earlier working session, additional local staging branches were created and validated, but they are not present in the current visible branch list anymore. Treat the branch split below as the authoritative plan to recreate.
 
 ## Recommended PR split
