@@ -105,16 +105,16 @@ Cherry-picks:
 - Existing saved annotations keep working because later commits add `keyMap`, `@ref` occurrence matching, and fallback handling.
 
 ## Files that matter most
-- `/home/runner/work/tei-publisher-jinks/tei-publisher-jinks/profiles/annotate/resources/scripts/annotations/annotations.js`
-- `/home/runner/work/tei-publisher-jinks/tei-publisher-jinks/profiles/annotate/modules/annotations/tei-annotation-config.tpl.xqm`
-- `/home/runner/work/tei-publisher-jinks/tei-publisher-jinks/profiles/annotate/templates/pages/annotate-tei.html`
-- `/home/runner/work/tei-publisher-jinks/tei-publisher-jinks/profiles/annotate/templates/pages/annotate.html`
-- `/home/runner/work/tei-publisher-jinks/tei-publisher-jinks/profiles/annotate/resources/css/annotate.css`
-- `/home/runner/work/tei-publisher-jinks/tei-publisher-jinks/profiles/annotate/templates/annotation-blocks.html`
-- `/home/runner/work/tei-publisher-jinks/tei-publisher-jinks/profiles/forms/config.json`
-- `/home/runner/work/tei-publisher-jinks/tei-publisher-jinks/profiles/docs/data/doc/annotations.xml`
-- `/home/runner/work/tei-publisher-jinks/tei-publisher-jinks/profiles/docs/data/doc/reconcile.xml`
-- `/home/runner/work/tei-publisher-jinks/tei-publisher-jinks/profiles/annotate/config.json`
+- `profiles/annotate/resources/scripts/annotations/annotations.js`
+- `profiles/annotate/modules/annotations/tei-annotation-config.tpl.xqm`
+- `profiles/annotate/templates/pages/annotate-tei.html`
+- `profiles/annotate/templates/pages/annotate.html`
+- `profiles/annotate/resources/css/annotate.css`
+- `profiles/annotate/templates/annotation-blocks.html`
+- `profiles/forms/config.json`
+- `profiles/docs/data/doc/annotations.xml`
+- `profiles/docs/data/doc/reconcile.xml`
+- `profiles/annotate/config.json`
 
 ## Previously observed mixed-commit trouble spots
 - `9f1181de` mixes UI fixes with person/reconcile/id-prefix behavior.
