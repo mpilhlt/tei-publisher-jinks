@@ -11,6 +11,8 @@ In the earlier working session, additional local staging branches were created a
 
 ## Recommended PR split
 
+Commit subjects below are quoted verbatim from git history.
+
 ### Draft PR A — safety / hardening / forms bootstrapping
 Cherry-picks:
 - `b6063034` — `fix: stop building innerHTML from document-editable text via template literals`
@@ -132,12 +134,12 @@ Cherry-picks:
 
 ## Important review findings to preserve when reconstructing branches
 A later validation run flagged regressions that should be fixed before finalizing annotate-side PRs:
-- do not reintroduce `innerHTML` XSS in `profiles/annotate/resources/scripts/annotations/annotations.js`
-- keep the `string()` atomization fix in commit-save properties in `profiles/annotate/templates/pages/annotate.html`
-- keep the `<option data-i18n="...">` fix for status dropdown labels
-- keep `force=""` on the relevant `fx-refresh` calls for panel closing reliability
-- keep `.authority-info` as a class selector in CSS, not `#authority-info`
-- keep the reliable annotate-link doctype computation in `profiles/annotate/templates/annotation-blocks.html`
+- ensure `profiles/annotate/resources/scripts/annotations/annotations.js` does not reintroduce `innerHTML` XSS
+- ensure the `string()` atomization fix remains in commit-save properties in `profiles/annotate/templates/pages/annotate.html`
+- ensure the `<option data-i18n="...">` fix remains for status dropdown labels
+- ensure `force=""` remains on the relevant `fx-refresh` calls for panel closing reliability
+- ensure `.authority-info` remains a class selector in CSS, not `#authority-info`
+- ensure the reliable annotate-link doctype computation remains in `profiles/annotate/templates/annotation-blocks.html`
 
 ## Suggested first prompt for Claude Code at home
 
