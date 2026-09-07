@@ -184,7 +184,7 @@
     {
       "id": "PR2",
       "title": "reconcile profile proper",
-      "kind": "draft",
+      "kind": "pr",
       "submissionOrder": 6,
       "commits": [
         {
